@@ -1,56 +1,28 @@
 // src/components folder will be custom components we will make
-// This file is a module because there's an export
+// This file is a module because there's an export. Removed all state data since this will be a presentational component
 // Since this file is a React component, it MUST return a React element
 // images from: public/assets/images
 import React, { Component } from 'react';   // Default React import, { named import called 'Component' }
+import { Card, CardImg, CardImgOverlay, CardTitle } from 'reactstrap'   // import react card component
 
 class Directory extends Component {     // create a child class (Directory) from parent class (Component) that we imported on line 3
-    constructor(props) {     // 'props' : keyword in React | constructor is not always required
-        super(props);        // 'this.props' is already in the 'Component' parent class so use 'super()'
-        this.state = {       // 'state' : property in React that always holds an object. 'campsites' is its property with diff arr
-            campsites: [
-                {
-                    id: 0,
-                    name: 'React Lake Campground',
-                    image: 'assets/images/react-lake.jpg',
-                    elevation: 1233,
-                    description: "Nestled in the foothills of the Chrome Mountains, this campground on the shores of the pristine React Lake is a favorite for fly fishers."
-                },
-                {
-                    id: 1,
-                    name: 'Chrome River Campground ',
-                    image: 'assets/images/chrome-river.jpg',
-                    elevation: 877,
-                    description: "Spend a few sunny days and starry nights beneath a canopy of old-growth firs at this enchanting spot by the Chrome River."
-                },
-                {
-                    id: 2,
-                    name: 'Breadcrumb Trail Campground',
-                    image: 'assets/images/breadcrumb-trail.jpg',
-                    elevation: 2901,
-                    description: "Let NuCamp be your guide to this off-the-beaten-path, hike-in-only campground."
-                },
-                {
-                    id: 3,
-                    name: 'Redux Woods Campground',
-                    image: 'assets/images/redux-woods.jpg',
-                    elevation: 42,
-                    description: "You'll never want to leave this hidden gem, deep within the lush Redux Woods."
-                }
-            ]
-        };
-    }
-
     render() {  // must have 1 return statement
         // 'directory' : variable that will return an array of elements
         //  grab the array from 'this.state.campsites' | .map() will return a new array 
-        const directory = this.state.campsites.map(campsite => {
+        // this.state.campsites.map doesn't have a property anymore so change to -> this.props.campsites.map (since it's now being passed as props)
+        const directory = this.props.campsites.map(campsite => {
             return (    // Notice: This return is FROM THIS ARROW FUNCTION NOT THE WHOLE COMPONENT
                         // Since we're rendering an array of elements, you MUST ADD A 'key' attribute to the parent class (this usually represents an ID {this.state.campsites.id})
-                <div key={campsite.id} className="col"> 
-                    <img src={campsite.image} alt={campsites.name} />
-                    <h2>{campsite.name}</h2>
-                    <p>{campsite.description}</p>
+                        // <Card> elements are imported from line  6, replaced: <h2> to <CardTitle>
+                        // if we click on one of these cards, it will show its description
+                        // <Card onClick={() => this.onCampsiteSelect(campsite)}>  onClick event handler returning the function onCampsiteSelect
+                <div key={campsite.id} className="col-md-5"> 
+                    <Card onClick={() => this.props.onClick(campsite.id)}>  
+                        <CardImg width="100%" src={campsite.image} alt={campsite.name} />
+                        <CardImgOverlay>
+                            <CardTitle>{campsite.name}</CardTitle>
+                        </CardImgOverlay>
+                    </Card>
                 </div>
                 // This is all JSX, so if we want to call something, use {}
             );
@@ -61,11 +33,38 @@ class Directory extends Component {     // create a child class (Directory) from
             <div className="container">     
                 <div className="row">       
                     {directory}             
-                </div>
+                </div>                
             </div>
         );
     }
 }
+
+/*******    MORE EXAMPLES   *******
+// Local state: other parts of the app cannot see it
+// To pass state data from Component A to Component B, include that data as an attribute when rendering B inside A
+class ExampleParentComponent extends Component {    // 'ExampleParentComponent' is a class that will hold local state (needs a constructor)
+    constructor(props) {
+        super(props);
+        this.state = {
+            number: 333
+        }
+    }
+    render() {
+        return <ExampleChildComponent number={this.state.number} greeting="Hello World" />;     // 'number' or 'greeting' variable can be any name 
+                                                                                                // as long as it's the same as the property name you're passing
+                                                                                                // then provide its value (can be #'s or string)
+    }
+}
+
+class ExampleChildComponent extends Component {     // 'ExampleChildComponent' is the child class, will receive 'ExampleParentComponent's data
+    render() {
+        return <div>{this.props.number} {this.props.greeting}</div>     // access the data 
+    };
+}
+// Then add <ExampleParentComponent /> before the closing tag </div> on the return value of render() in class Directory
+// This will add '333 Hello World' output on the webpage
+
+************************************/
 
 export default Directory;   // go to 'App.js' then add:  '  import Directory from './components/DirectoryComponent';   '
                             //      > still on 'App.js', render it in the return statement of 'render()' with its 
