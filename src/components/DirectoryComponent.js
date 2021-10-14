@@ -2,41 +2,48 @@
 // This file is a module because there's an export. Removed all state data since this will be a presentational component
 // Since this file is a React component, it MUST return a React element
 // images from: public/assets/images
-import React, { Component } from 'react';   // Default React import, { named import called 'Component' }
+import React from 'react';   // Default React import, { named import called 'Component' }
 import { Card, CardImg, CardImgOverlay, CardTitle } from 'reactstrap'   // import react card component
 
-class Directory extends Component {     // create a child class (Directory) from parent class (Component) that we imported on line 3
-    render() {  // must have 1 return statement
-        // 'directory' : variable that will return an array of elements
-        //  grab the array from 'this.state.campsites' | .map() will return a new array 
-        // this.state.campsites.map doesn't have a property anymore so change to -> this.props.campsites.map (since it's now being passed as props)
-        const directory = this.props.campsites.map(campsite => {
-            return (    // Notice: This return is FROM THIS ARROW FUNCTION NOT THE WHOLE COMPONENT
-                        // Since we're rendering an array of elements, you MUST ADD A 'key' attribute to the parent class (this usually represents an ID {this.state.campsites.id})
-                        // <Card> elements are imported from line  6, replaced: <h2> to <CardTitle>
-                        // if we click on one of these cards, it will show its description
-                        // <Card onClick={() => this.onCampsiteSelect(campsite)}>  onClick event handler returning the function onCampsiteSelect
-                <div key={campsite.id} className="col-md-5"> 
-                    <Card onClick={() => this.props.onClick(campsite.id)}>  
-                        <CardImg width="100%" src={campsite.image} alt={campsite.name} />
-                        <CardImgOverlay>
-                            <CardTitle>{campsite.name}</CardTitle>
-                        </CardImgOverlay>
-                    </Card>
-                </div>
-                // This is all JSX, so if we want to call something, use {}
-            );
-        });     
-        return (        // Notice: returns 1 element (div=container parent class) and its children
-                        // 'className' for React js instead of 'class' in HTML
-                        // { javascript variable (line 45) is getting called (or rendered in this case) } must have curly braces inside of JSX
-            <div className="container">     
-                <div className="row">       
-                    {directory}             
-                </div>                
+// renders each card with different campsite details
+function RenderDirectoryItem({campsite, onClick}) { // destrucure props object
+    // no constructor/ render(), only 1 return
+    return (
+        <Card onClick={() => onClick(campsite.id)}>  
+            <CardImg width="100%" src={campsite.image} alt={campsite.name} />
+            <CardImgOverlay>
+                <CardTitle>{campsite.name}</CardTitle>
+            </CardImgOverlay>
+        </Card>
+    );
+}
+
+function Directory(props) {     // create a child class (Directory) from parent class (Component) that we imported on line 3
+    // 'directory' : variable that will return an array of elements
+    //  grab the array from 'this.state.campsites' | .map() will return a new array 
+    // this.state.campsites.map doesn't have a property anymore so change to -> this.props.campsites.map (since it's now being passed as props)
+    const directory = props.campsites.map(campsite => {
+        return (    // Notice: This return is FROM THIS ARROW FUNCTION NOT THE WHOLE COMPONENT
+                    // Since we're rendering an array of elements, you MUST ADD A 'key' attribute to the parent class (this usually represents an ID {this.state.campsites.id})
+                    // <Card> elements are imported from line  6, replaced: <h2> to <CardTitle>
+                    // if we click on one of these cards, it will show its description
+                    // <Card onClick={() => this.onCampsiteSelect(campsite)}>  onClick event handler returning the function onCampsiteSelect
+            <div key={campsite.id} className="col-md-5"> 
+                <RenderDirectoryItem campsite={campsite} onClick={props.onClick} />
             </div>
+            // This is all JSX, so if we want to call something, use {}
         );
-    }
+    });     
+    return (        // Notice: returns 1 element (div=container parent class) and its children
+                    // 'className' for React js instead of 'class' in HTML
+                    // { javascript variable (line 45) is getting called (or rendered in this case) } must have curly braces inside of JSX
+        <div className="container">     
+            <div className="row">       
+                {directory}             
+            </div>                
+        </div>
+    );
+    
 }
 
 /*******    MORE EXAMPLES   *******
