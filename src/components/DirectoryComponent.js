@@ -3,20 +3,24 @@
 // Since this file is a React component, it MUST return a React element
 // images from: public/assets/images
 import React from 'react';   // Default React import, { named import called 'Component' }
-import { Card, CardImg, CardImgOverlay, CardTitle } from 'reactstrap'   // import react card component
+import { Card, CardImg, CardImgOverlay, CardTitle, Breadcrumb, BreadcrumbItem } from 'reactstrap'   // import react card and breadcrumbs component
+import { Link } from 'react-router-dom';    // for linking to a page (similar to <a href=>)
 
 // renders each card with different campsite details
-function RenderDirectoryItem({campsite, onClick}) { // destrucure props object
+function RenderDirectoryItem({campsite}) { // destrucure props object
     // no constructor/ render(), only 1 return
     return (
-        <Card onClick={() => onClick(campsite.id)}>  
-            <CardImg width="100%" src={campsite.image} alt={campsite.name} />
-            <CardImgOverlay>
-                <CardTitle>{campsite.name}</CardTitle>
-            </CardImgOverlay>
+        <Card>  
+            <Link to={`/directory/${campsite.id}`}>
+                <CardImg width="100%" src={campsite.image} alt={campsite.name} />
+                <CardImgOverlay>
+                    <CardTitle>{campsite.name}</CardTitle>
+                </CardImgOverlay>
+            </Link>
         </Card>
     );
 }
+// <Link to={`/directory/${campsite.id}`}></Link>   : url dynamic link that will change based on campsite clicked with their corresponding id          
 
 function Directory(props) {     // create a child class (Directory) from parent class (Component) that we imported on line 3
     // 'directory' : variable that will return an array of elements
@@ -29,7 +33,7 @@ function Directory(props) {     // create a child class (Directory) from parent 
                     // if we click on one of these cards, it will show its description
                     // <Card onClick={() => this.onCampsiteSelect(campsite)}>  onClick event handler returning the function onCampsiteSelect
             <div key={campsite.id} className="col-md-5"> 
-                <RenderDirectoryItem campsite={campsite} onClick={props.onClick} />
+                <RenderDirectoryItem campsite={campsite} />
             </div>
             // This is all JSX, so if we want to call something, use {}
         );
@@ -37,7 +41,17 @@ function Directory(props) {     // create a child class (Directory) from parent 
     return (        // Notice: returns 1 element (div=container parent class) and its children
                     // 'className' for React js instead of 'class' in HTML
                     // { javascript variable (line 45) is getting called (or rendered in this case) } must have curly braces inside of JSX
-        <div className="container">     
+        <div className="container">   
+            <div className="row">
+                <div className="col">
+                    <Breadcrumb>
+                        <BreadcrumbItem><Link to="/home">Home</Link></BreadcrumbItem>
+                        <BreadcrumbItem active>Directory</BreadcrumbItem>                                                
+                    </Breadcrumb>
+                    <h2>Directory</h2>
+                    <hr />
+                </div>
+            </div>  
             <div className="row">       
                 {directory}             
             </div>                
