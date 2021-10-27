@@ -5,6 +5,7 @@
 import React from 'react';   // Default React import, { named import called 'Component' }
 import { Card, CardImg, CardImgOverlay, CardTitle, Breadcrumb, BreadcrumbItem } from 'reactstrap'   // import react card and breadcrumbs component
 import { Link } from 'react-router-dom';    // for linking to a page (similar to <a href=>)
+import { Loading } from './LoadingComponent';
 
 // renders each card with different campsite details
 function RenderDirectoryItem({campsite}) { // destrucure props object
@@ -26,7 +27,7 @@ function Directory(props) {     // create a child class (Directory) from parent 
     // 'directory' : variable that will return an array of elements
     //  grab the array from 'this.state.campsites' | .map() will return a new array 
     // this.state.campsites.map doesn't have a property anymore so change to -> this.props.campsites.map (since it's now being passed as props)
-    const directory = props.campsites.map(campsite => {
+    const directory = props.campsites.campsites.map(campsite => {
         return (    // Notice: This return is FROM THIS ARROW FUNCTION NOT THE WHOLE COMPONENT
                     // Since we're rendering an array of elements, you MUST ADD A 'key' attribute to the parent class (this usually represents an ID {this.state.campsites.id})
                     // <Card> elements are imported from line  6, replaced: <h2> to <CardTitle>
@@ -37,7 +38,32 @@ function Directory(props) {     // create a child class (Directory) from parent 
             </div>
             // This is all JSX, so if we want to call something, use {}
         );
-    });     
+    });    
+    
+    // Wait for the server to be loaded
+    if (props.campsites.isLoading) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <Loading />
+                </div>
+            </div>
+        );
+    }
+
+    // Error loading the server
+    if (props.campsites.errMess) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <div className="col">
+                        <h4>{props.campsites.errMess}</h4>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (        // Notice: returns 1 element (div=container parent class) and its children
                     // 'className' for React js instead of 'class' in HTML
                     // { javascript variable (line 45) is getting called (or rendered in this case) } must have curly braces inside of JSX

@@ -12,6 +12,7 @@ import Contact from './ContactComponent';
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom';  
 // React redux component we downloaded
 import { connect } from 'react-redux';
+import { addComment, fetchCampsites } from '../redux/ActionCreators';   // for dispatching
 
 // All the state is now stored in /src/redux/reducer.js so pass it in
 const mapStateToProps = state => {
@@ -20,16 +21,32 @@ const mapStateToProps = state => {
         comments: state.comments,
         partners: state.partners,
         promotions: state.promotions
-    };
-};
+    }
+};  // then add this object in the export connect()
+
+// For dispatching, can set it up as a function or an object (recommentded)
+const mapDispatchToProps = {
+    addComment: (campsiteId, rating, author, text) => (addComment(campsiteId, rating, author, text)), 
+    fetchCampsites: () => (fetchCampsites())
+    // (function parameters) => (returns action creator(for each parameters))
+};  // then add this object in the export connect()
 
 class Main extends Component {
+    
+    // fetch the campsites data as soon as we render the main components to the DOM
+    componentDidMount() {   // built-in react lifecycle method when there are certain points that it gets created/ updated to or gets removed from the DOM 
+        this.props.fetchCampsites();
+    }
 
     render() {  
         const HomePage = () => {
             return(
                 <Home 
-                    campsite={this.props.campsites.filter(campsite => campsite.featured)[0]}
+                    // Before: this.props.campsites was holding campsites array[...]
+                    // Now: this.props.campsites is holding {isLoading: false, errMess: null, campsites array[...]}
+                    campsite={this.props.campsites.campsites.filter(campsite => campsite.featured)[0]}
+                    campsitesLoading={this.props.campsites.isLoading}
+                    campsitesErrMess={this.props.campsites.errMess}
                     promotion={this.props.promotions.filter(promotion => promotion.featured)[0]}
                     partner={this.props.partners.filter(partner => partner.featured)[0]}
                 />
@@ -40,8 +57,11 @@ class Main extends Component {
         const CampsiteWithId = ({match}) => {
             return (
                 <CampsiteInfo 
-                    campsite={this.props.campsites.filter(campsite => campsite.id === +match.params.campsiteId)[0]} 
+                    campsite={this.props.campsites.campsites.filter(campsite => campsite.id === +match.params.campsiteId)[0]} 
+                    isLoading={this.props.campsites.isLoading}
+                    errMess={this.props.campsites.errMess}
                     comments={this.props.comments.filter(comment => comment.campsiteId === +match.params.campsiteId)}
+                    addComment={this.props.addComment}  // pass addComment object (from mapDispatchToProps) as a prop
                 />
             );
         }   // take the campsite id and since it is stored as a string, convert it to a number with '+match.params.campsiteId'
@@ -76,5 +96,7 @@ class Main extends Component {
     }
 }
 
-export default withRouter(connect(mapStateToProps)(Main));  
-// withRouter: so that React Router still works (connect: the state object that's stored in the Redux store (mapStateToProps) connects into (Main))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Main));  
+// withRouter: so that React Router still works 
+//      (connect: the state object that's stored in the Redux store (mapStateToProps, 
+//          mapDispatchToProps) made the addComment Action creator function available inside (Main component as a prop))

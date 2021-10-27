@@ -1,6 +1,89 @@
-import React from 'react';
-import { Card, CardImg, CardText, CardBody, Breadcrumb, BreadcrumbItem } from 'reactstrap'
+import React, { Component } from 'react';
+import { Card, CardImg, CardText, CardBody, Breadcrumb, BreadcrumbItem, Button, 
+    Modal, ModalHeader, ModalBody, Label  } from 'reactstrap'
 import { Link } from 'react-router-dom';    // for linking to a page (similar to <a href=>)
+import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Loading } from './LoadingComponent';
+
+const maxLength = len => val => !val || (val.length <= len);
+const minLength = len => val => val && (val.length >= len);
+
+class CommentForm extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isModalOpen: false,
+            touched: {
+                name: false
+            }
+        };
+        this.toggleModal = this.toggleModal.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    toggleModal() {           
+        this.setState({         
+            isModalOpen: !this.state.isModalOpen    
+        });
+    }
+
+    handleSubmit(values) {
+        this.toggleModal();
+        this.props.addComment(this.props.campsiteId, values.rating, values.author, values.text);    
+        // when form is submitted, addComment action creator will create an action (using the values from this form)
+    }
+
+    render() {
+         return(
+             <div>
+                <Button outline onClick={this.toggleModal}><i className="fa fa-pencil fa-lg" /> Submit Comment</Button>
+
+                <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
+                    <ModalHeader toggle={this.toggleModal}>Submit Comment</ModalHeader>
+                    <ModalBody>
+                        <LocalForm onSubmit={this.handleSubmit}>
+                            <div className="form-group">
+                                <Label htmlFor="rating">Rating</Label>
+                                <Control.select defaultValue="1" model=".rating" id="rating" name="rating" className="form-control">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                </Control.select>
+                            </div>
+                            <div className="form-group">
+                                <Label htmlFor="author">Your Name</Label>
+                                <Control.text model=".author" id="author" name="author" placeholder="Your Name" className="form-control"
+                                    validators={{      
+                                        minLength: minLength(2),
+                                        maxLength: maxLength(15)
+                                    }} 
+                                />
+                                <Errors                             
+                                        className="text-danger"        
+                                        model=".author"       
+                                        show="touched"           
+                                        component="div"                 
+                                        messages={{                    
+                                            required: 'Required',
+                                            minLength: 'Must be at least 2 characters',
+                                            maxLength: 'Must be 15 characters or less'
+                                        }}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <Label htmlFor="text">Comment</Label>
+                                <Control.textarea model=".text" id="text" name="text" rows="6" className="form-control"/>
+                            </div>
+                            <Button type="submit" color="primary">Submit</Button>
+                        </LocalForm>
+                    </ModalBody>
+                </Modal> 
+             </div>  
+         );
+     };
+ }
 
 // 3 FUNCTIONAL COMPONENTS
 function RenderCampsite({campsite}) {   // destructure campsite property from the props object
@@ -16,7 +99,7 @@ function RenderCampsite({campsite}) {   // destructure campsite property from th
     );
 }
 
-function RenderComments({comments}) {   // destructure comments property from the props object
+function RenderComments({comments, addComment, campsiteId}) {   // destructure object properties from the props
     if (comments) {
         return(
             <div className="col-md-5 m-1">
@@ -29,13 +112,39 @@ function RenderComments({comments}) {   // destructure comments property from th
                         </p>
                     </div>)
                 }
+                <CommentForm campsiteId={campsiteId} addComment={addComment} /> 
             </div>
+                // <CommentForm pass the campsiteId and addComment to its child component/>
         );
     }
     return <div />
 }
 
 function CampsiteInfo(props) {
+    // To wait for the server to be loaded
+    if (props.isLoading) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <Loading />
+                </div>
+            </div>
+        );
+    }
+
+    // If there's an error on the server when we try to fetch campsite's data
+    if (props.errMess) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <div className="col">
+                        <h4>{props.errMess}</h4>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
     if (props.campsite) {
         return(
             <div className="container">
@@ -50,8 +159,11 @@ function CampsiteInfo(props) {
                     </div>
                 </div>
                 <div className="row">
-                    <RenderCampsite campsite={(props.campsite)} />
-                    <RenderComments comments={(props.comments)} />
+                    <RenderCampsite campsite={props.campsite} />
+                    <RenderComments 
+                        comments={props.comments}
+                        addComment={props.addComment}
+                        campsiteId={props.campsite.id} />
                 </div>
             </div>
         );
