@@ -22,8 +22,23 @@ export const fetchCampsites = () => dispatch => {   // 2 arrow functions = neste
     dispatch(campsitesLoading());   // use dispatch method to dispatch a different action (function below after this)
 
     return fetch(baseUrl + 'campsites')             // url + location of campsites folder (inside is campsites data)
+        .then(response => {
+                if (response.ok) {  // .ok is status code for success (200-299)
+                    return response;
+                } else {    // else, create an error object and throw to the catch block
+                    const error = new Error(`Error ${response.status}: ${response.statusText}`);    // '.status' and '.statusText' are built-in properties that fetches response object
+                    error.response = response;
+                    throw error;    // Output: "Error 404: Not Found"
+                }
+            },
+            error => {  // another callback rejected promise that we didn't get a response from the server at all
+                const errMess = new Error(error.message);       
+                throw errMess;      // Output: "Failed to fetch"
+            }
+        )  // server could've returned a bad response (404) but this promise is considered resolved as long as it has a response that there's been an error
         .then(response => response.json())          // call to fetch returns a promise (converts response from json into javascript (which is the array of campsites))
-        .then(campsites => dispatch(addCampsites(campsites)));      // chain another method. grab the successful fetch and dispatch with(addCampsites action creator)
+        .then(campsites => dispatch(addCampsites(campsites)))      // chain another method. grab the successful fetch and dispatch with(addCampsites action creator)
+        .catch(error => dispatch(campsitesFailed(error.message)));
 };
 
 // Standard action creator to return object and goes straight to reducer
@@ -45,8 +60,23 @@ export const addCampsites = campsites => ({
 
 export const fetchComments = () => dispatch => {
     return fetch(baseUrl + 'comments') 
+        .then(response => {
+                if (response.ok) {
+                    return response;
+                } else {
+                    const error = new Error(`Error ${response.status}: ${response.statusText}`);
+                    error.response = response;
+                    throw error;
+                }
+            },
+            error => {
+                const errMess = new Error(error.message);
+                throw errMess;
+            }
+        )
         .then(response => response.json())
-        .then(comments => dispatch(addComments(comments)));
+        .then(comments => dispatch(addComments(comments)))
+        .catch(error => dispatch(commentsFailed(error.message)));
 };
 
 export const commentsFailed = errMess => ({
@@ -63,8 +93,23 @@ export const fetchPromotions = () => dispatch => {
     dispatch(promotionsLoading());
 
     return fetch(baseUrl + 'promotions')
+        .then(response => {
+                if (response.ok) {
+                    return response;
+                } else {
+                    const error = new Error(`Error ${response.status}: ${response.statusText}`);
+                    error.response = response;
+                    throw error;
+                }
+            },
+            error => {
+                const errMess = new Error(error.message);
+                throw errMess;
+            }
+        )
         .then(response => response.json())
-        .then(promotions => dispatch(addPromotions(promotions)));
+        .then(promotions => dispatch(addPromotions(promotions)))
+        .catch(error => dispatch(promotionsFailed(error.message)));
 }
 
 export const promotionsLoading = () => ({
