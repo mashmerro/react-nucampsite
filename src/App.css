@@ -45,3 +45,29 @@ h2 {
 .navbar-dark {
   background-color: #901CAD;
 }
+
+/* Effects and animation after installing react-transition-group
+  -enter, -enter-active, -exit. -exit-active 
+  .page is our base className */
+
+/* transition when you mount a component */
+.page-enter {
+  opacity: 0;
+  transform: translateX(-100%); /* start from left position horizontally */
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateX(0%);  /* goes back to normal postion horizontally */
+  transition: 300ms ease-out; /* ease-out: for coming in, start fast then decelerates as it reaches the end */
+}
+
+/* transition when you unmount a component */
+.page-exit {
+  opacity: 1;
+}
+
+.page-exit-active {
+  opacity: 0;
+  transition: 300ms ease-in;  /* ease-in: for coming out, starts slow then accelerates at the end */
+}

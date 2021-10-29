@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';    // for linking to a page (similar to
 import { Control, LocalForm, Errors } from 'react-redux-form';
 import { Loading } from './LoadingComponent';
 import { baseUrl } from '../shared/baseUrl';
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
 const maxLength = len => val => !val || (val.length <= len);
 const minLength = len => val => val && (val.length >= len);
@@ -90,13 +91,21 @@ class CommentForm extends Component {
 function RenderCampsite({campsite}) {   // destructure campsite property from the props object
     return(
         <div className="col-md-5 m-1">
-            <Card>
-                <CardImg top src={baseUrl + campsite.image} alt={campsite.name} />
-                <CardBody>
-                    <CardText>{campsite.description}</CardText>
-                </CardBody>
-            </Card>
+            <FadeTransform in
+                transformProps={{
+                    exitTransform: 'scale(0.5) translateY(-50%)'
+            }}>
+                <Card>
+                    <CardImg top src={baseUrl + campsite.image} alt={campsite.name} />
+                    <CardBody>
+                        <CardText>{campsite.description}</CardText>
+                    </CardBody>
+                </Card>
+            </FadeTransform>
         </div>
+        // 'in' : is a FadeTransform attribute to run transition when being mounted
+        // transformProps={{ exitTransform: 'scale(0.5) translateY(50%)'}}  : sets initial scale of 50% to normal value that makes a pop effect and move vertically
+        //          : {outer curly: to embed js inside jsx {inner curly: object's properties}}
     );
 }
 
@@ -105,14 +114,22 @@ function RenderComments({comments, postComment, campsiteId}) {   // destructure 
         return(
             <div className="col-md-5 m-1">
                 <h4>Comments</h4>
-                {comments.map(comment => 
-                    <div key={comment.id} className="pb-3">
-                        <p>{comment.text}<br/>
-                        --{comment.author}, {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', 
-                        day: '2-digit'}).format(new Date(Date.parse(comment.date)))}
-                        </p>
-                    </div>)
-                }
+                <Stagger in>
+                    {comments.map(comment => {
+                        return (
+                            <Fade in key={comment.id}>
+                                <div>
+                                    <p>{comment.text}<br/>
+                                        --{comment.author}, {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', 
+                                        day: '2-digit'}).format(new Date(Date.parse(comment.date)))
+                                        }
+                                    </p>
+                                </div>
+                            </Fade>
+                        );  // fade effect in each comments as they're rendered
+                        // stagger animation for all comments (one by one)
+                    })}
+                </Stagger>  
                 <CommentForm campsiteId={campsiteId} postComment={postComment} /> 
             </div>
                 // <CommentForm pass the campsiteId and postComment to its child component/>
