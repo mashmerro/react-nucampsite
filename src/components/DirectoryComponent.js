@@ -6,6 +6,7 @@ import React from 'react';   // Default React import, { named import called 'Com
 import { Card, CardImg, CardImgOverlay, CardTitle, Breadcrumb, BreadcrumbItem } from 'reactstrap'   // import react card and breadcrumbs component
 import { Link } from 'react-router-dom';    // for linking to a page (similar to <a href=>)
 import { Loading } from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
 
 // renders each card with different campsite details
 function RenderDirectoryItem({campsite}) { // destrucure props object
@@ -13,13 +14,13 @@ function RenderDirectoryItem({campsite}) { // destrucure props object
     return (
         <Card>  
             <Link to={`/directory/${campsite.id}`}>
-                <CardImg width="100%" src={campsite.image} alt={campsite.name} />
+                <CardImg width="100%" src={baseUrl + campsite.image} alt={campsite.name} />
                 <CardImgOverlay>
                     <CardTitle>{campsite.name}</CardTitle>
                 </CardImgOverlay>
             </Link>
         </Card>
-    );
+    );  // src={baseUrl + campsite.image} : image source will now be loaded from the server side url
 }
 // <Link to={`/directory/${campsite.id}`}></Link>   : url dynamic link that will change based on campsite clicked with their corresponding id          
 

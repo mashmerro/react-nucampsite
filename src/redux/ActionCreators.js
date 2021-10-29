@@ -1,8 +1,8 @@
 import * as ActionTypes from './ActionTypes';       // ActionTypes is a namespace
 // * is a wildcard that lets us import all named exports from ActionTypes.js at once
 
-import { CAMPSITES } from '../shared/campsites';
-// temp to use for our server simulation (since we don't have it connected to the server)
+import { baseUrl } from '../shared/baseUrl';
+// import json server (where we're storing our database arrays)
 
 // Action creator to return an object with 'type' property
 export const addComment = (campsiteId, rating, author, text) => ({  // pass the values needed to add a comment
@@ -21,9 +21,9 @@ export const addComment = (campsiteId, rating, author, text) => ({  // pass the 
 export const fetchCampsites = () => dispatch => {   // 2 arrow functions = nested functions (since we enabled redux thunk, we can do this syntax)
     dispatch(campsitesLoading());   // use dispatch method to dispatch a different action (function below after this)
 
-    setTimeout(() => {      // setTimeout((function), 2000ms) : will return a delay of 2 seconds then dispatches another action along with data from campsites array
-        dispatch(addCampsites(CAMPSITES));
-    }, 2000);
+    return fetch(baseUrl + 'campsites')             // url + location of campsites folder (inside is campsites data)
+        .then(response => response.json())          // call to fetch returns a promise (converts response from json into javascript (which is the array of campsites))
+        .then(campsites => dispatch(addCampsites(campsites)));      // chain another method. grab the successful fetch and dispatch with(addCampsites action creator)
 };
 
 // Standard action creator to return object and goes straight to reducer
@@ -41,4 +41,42 @@ export const campsitesFailed = errMess => ({
 export const addCampsites = campsites => ({
     type: ActionTypes.ADD_CAMPSITES,
     payload: campsites
+});
+
+export const fetchComments = () => dispatch => {
+    return fetch(baseUrl + 'comments') 
+        .then(response => response.json())
+        .then(comments => dispatch(addComments(comments)));
+};
+
+export const commentsFailed = errMess => ({
+    type: ActionTypes.COMMENTS_FAILED,
+    payload: errMess
+});
+
+export const addComments = comments => ({
+    type: ActionTypes.ADD_COMMENTS,
+    payload: comments
+});
+
+export const fetchPromotions = () => dispatch => {
+    dispatch(promotionsLoading());
+
+    return fetch(baseUrl + 'promotions')
+        .then(response => response.json())
+        .then(promotions => dispatch(addPromotions(promotions)));
+}
+
+export const promotionsLoading = () => ({
+    type: ActionTypes.PROMOTIONS_LOADING
+})
+
+export const promotionsFailed = errMess => ({
+    type: ActionTypes.PROMOTIONS_FAILED,
+    payload: errMess
+});
+
+export const addPromotions = promotions => ({
+    type: ActionTypes.ADD_PROMOTIONS,
+    payload: promotions
 });

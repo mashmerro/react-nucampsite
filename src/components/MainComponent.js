@@ -13,7 +13,7 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
 // React redux component we downloaded
 import { connect } from 'react-redux';
 import { actions } from 'react-redux-form';
-import { addComment, fetchCampsites } from '../redux/ActionCreators';   // for dispatching
+import { addComment, fetchCampsites, fetchComments, fetchPromotions } from '../redux/ActionCreators';   // for dispatching
 
 // All the state is now stored in /src/redux/reducer.js so pass it in
 const mapStateToProps = state => {
@@ -30,7 +30,9 @@ const mapDispatchToProps = {
     addComment: (campsiteId, rating, author, text) => (addComment(campsiteId, rating, author, text)), 
     fetchCampsites: () => (fetchCampsites()),
     // (function parameters) => (returns action creator(for each parameters))
-    resetFeedbackForm: () => (actions.reset('feedbackForm'))    // from configureStore.js
+    resetFeedbackForm: () => (actions.reset('feedbackForm')),    // from configureStore.js
+    fetchComments: () => (fetchComments()),
+    fetchPromotions: () => (fetchPromotions())
 };  // then add this object in the export connect()
 
 class Main extends Component {
@@ -38,6 +40,8 @@ class Main extends Component {
     // fetch the campsites data as soon as we render the main components to the DOM
     componentDidMount() {   // built-in react lifecycle method when there are certain points that it gets created/ updated to or gets removed from the DOM 
         this.props.fetchCampsites();
+        this.props.fetchComments();
+        this.props.fetchPromotions();
     }
 
     render() {  
@@ -49,7 +53,9 @@ class Main extends Component {
                     campsite={this.props.campsites.campsites.filter(campsite => campsite.featured)[0]}
                     campsitesLoading={this.props.campsites.isLoading}
                     campsitesErrMess={this.props.campsites.errMess}
-                    promotion={this.props.promotions.filter(promotion => promotion.featured)[0]}
+                    promotion={this.props.promotions.promotions.filter(promotion => promotion.featured)[0]} // promotions object pointing to its property called promotions
+                    promotionLoading={this.props.promotions.isLoading}
+                    promotionErrMess={this.props.promotions.errMess}
                     partner={this.props.partners.filter(partner => partner.featured)[0]}
                 />
             );
@@ -62,7 +68,8 @@ class Main extends Component {
                     campsite={this.props.campsites.campsites.filter(campsite => campsite.id === +match.params.campsiteId)[0]} 
                     isLoading={this.props.campsites.isLoading}
                     errMess={this.props.campsites.errMess}
-                    comments={this.props.comments.filter(comment => comment.campsiteId === +match.params.campsiteId)}
+                    comments={this.props.comments.comments.filter(comment => comment.campsiteId === +match.params.campsiteId)}
+                    commentsErrMess={this.props.comments.errMess}
                     addComment={this.props.addComment}  // pass addComment object (from mapDispatchToProps) as a prop
                 />
             );

@@ -6,3 +6,9 @@ export const CAMPSITES_LOADING = 'CAMPSITES_LOADING';
 export const CAMPSITES_FAILED = 'CAMPSITE_FAILED';
 // Dispatches when campsites data successfully retrieves from the server and can safely add to the state
 export const ADD_CAMPSITES = 'ADD_CAMPSITES';
+
+export const ADD_COMMENTS = 'ADD_COMMENTS';
+export const COMMENTS_FAILED = 'COMMENTS_FAILED';
+export const PROMOTIONS_LOADING ='PROMOTIONS_LOADING';
+export const ADD_PROMOTIONS = 'ADD_PROMOTIONS';
+export const PROMOTIONS_FAILED = 'PROMOTIONS_FAILED';
