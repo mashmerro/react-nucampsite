@@ -30,8 +30,8 @@ class CommentForm extends Component {
 
     handleSubmit(values) {
         this.toggleModal();
-        this.props.addComment(this.props.campsiteId, values.rating, values.author, values.text);    
-        // when form is submitted, addComment action creator will create an action (using the values from this form)
+        this.props.postComment(this.props.campsiteId, values.rating, values.author, values.text);    
+        // when form is submitted, postComment action creator will create an action (using the values from this form)
     }
 
     render() {
@@ -100,7 +100,7 @@ function RenderCampsite({campsite}) {   // destructure campsite property from th
     );
 }
 
-function RenderComments({comments, addComment, campsiteId}) {   // destructure object properties from the props
+function RenderComments({comments, postComment, campsiteId}) {   // destructure object properties from the props
     if (comments) {
         return(
             <div className="col-md-5 m-1">
@@ -113,9 +113,9 @@ function RenderComments({comments, addComment, campsiteId}) {   // destructure o
                         </p>
                     </div>)
                 }
-                <CommentForm campsiteId={campsiteId} addComment={addComment} /> 
+                <CommentForm campsiteId={campsiteId} postComment={postComment} /> 
             </div>
-                // <CommentForm pass the campsiteId and addComment to its child component/>
+                // <CommentForm pass the campsiteId and postComment to its child component/>
         );
     }
     return <div />
@@ -163,7 +163,7 @@ function CampsiteInfo(props) {
                     <RenderCampsite campsite={props.campsite} />
                     <RenderComments 
                         comments={props.comments}
-                        addComment={props.addComment}
+                        postComment={props.postComment}
                         campsiteId={props.campsite.id} />
                 </div>
             </div>

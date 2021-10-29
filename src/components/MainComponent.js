@@ -13,7 +13,7 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
 // React redux component we downloaded
 import { connect } from 'react-redux';
 import { actions } from 'react-redux-form';
-import { addComment, fetchCampsites, fetchComments, fetchPromotions } from '../redux/ActionCreators';   // for dispatching
+import { postComment, fetchCampsites, fetchComments, fetchPromotions } from '../redux/ActionCreators';   // for dispatching
 
 // All the state is now stored in /src/redux/reducer.js so pass it in
 const mapStateToProps = state => {
@@ -27,7 +27,7 @@ const mapStateToProps = state => {
 
 // For dispatching, can set it up as a function or an object (recommentded)
 const mapDispatchToProps = {
-    addComment: (campsiteId, rating, author, text) => (addComment(campsiteId, rating, author, text)), 
+    postComment: (campsiteId, rating, author, text) => (postComment(campsiteId, rating, author, text)), 
     fetchCampsites: () => (fetchCampsites()),
     // (function parameters) => (returns action creator(for each parameters))
     resetFeedbackForm: () => (actions.reset('feedbackForm')),    // from configureStore.js
@@ -70,7 +70,7 @@ class Main extends Component {
                     errMess={this.props.campsites.errMess}
                     comments={this.props.comments.comments.filter(comment => comment.campsiteId === +match.params.campsiteId)}
                     commentsErrMess={this.props.comments.errMess}
-                    addComment={this.props.addComment}  // pass addComment object (from mapDispatchToProps) as a prop
+                    postComment={this.props.postComment}  // pass postComment object (from mapDispatchToProps) as a prop
                 />
             );
         }   // take the campsite id and since it is stored as a string, convert it to a number with '+match.params.campsiteId'
@@ -108,4 +108,4 @@ class Main extends Component {
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Main));  
 // withRouter: so that React Router still works 
 //      (connect: the state object that's stored in the Redux store (mapStateToProps, 
-//          mapDispatchToProps) made the addComment Action creator function available inside (Main component as a prop))
+//          mapDispatchToProps) made the postComment Action creator function available inside (Main component as a prop))

@@ -4,18 +4,6 @@ import * as ActionTypes from './ActionTypes';       // ActionTypes is a namespac
 import { baseUrl } from '../shared/baseUrl';
 // import json server (where we're storing our database arrays)
 
-// Action creator to return an object with 'type' property
-export const addComment = (campsiteId, rating, author, text) => ({  // pass the values needed to add a comment
-    type: ActionTypes.ADD_COMMENT,  // 'ActionTypes' we imported, .ADD_COMMENT lets us access that export that we made from ActionTypes.js
-    payload: {
-        campsiteId: campsiteId,
-        rating: rating,
-        // or in ES6, you can pass the same property names and values by:
-        author,
-        text
-    }
-});
-
 // Action creator that is being thunked (intercepted because of server connection)
 // Wehn 'fetchCampsites' gets dispatched, it also dispatches 'campsitesLoading'
 export const fetchCampsites = () => dispatch => {   // 2 arrow functions = nested functions (since we enabled redux thunk, we can do this syntax)
@@ -88,6 +76,50 @@ export const addComments = comments => ({
     type: ActionTypes.ADD_COMMENTS,
     payload: comments
 });
+
+export const addComment = comment => ({
+    type: ActionTypes.ADD_COMMENT,  // 'ActionTypes' we imported, .ADD_COMMENT lets us access that export that we made from ActionTypes.js
+    payload: comment
+});
+
+// Action creator using thunk and middleware to handle asynchronous calls
+export const postComment = (campsiteId, rating, author, text) => dispatch => {  // pass the values needed to add a comment
+    const newComment = {
+        campsiteId: campsiteId,
+        rating: rating,
+        // or in ES6, you can pass the same property names and values by:
+        author,
+        text
+    };
+    newComment.date = new Date().toISOString();
+
+    return fetch(baseUrl + 'comments', {
+        method: "POST", // "GET" is the default if you don't specify the method
+        body: JSON.stringify(newComment),   // JSON encoded version of the comment we created
+        headers: {
+            "Content-Type" : "application/json" // so the server knows to format body as json
+        }
+    })
+    
+    // Resolve & Reject
+    .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                const error = new Error(`Error ${response.status}: ${response.statusText}`);
+                error.response = response;
+                throw error;
+            }
+        },
+        error => { throw error; }   // promise is rejected throws an error to next catch block
+    )
+    .then(response => response.json())   // if successful, convert json to js object
+    .then(response => dispatch(addComment(response))) // then dispatch with addComment action creator so that the redux store can be updated
+    .catch(error => {       // catch rejected or throws for error prompt
+        console.log('post comment', error.message);
+        alert('Your comment could not be posted\nError: ' + error.message);
+    });
+};
 
 export const fetchPromotions = () => dispatch => {
     dispatch(promotionsLoading());
