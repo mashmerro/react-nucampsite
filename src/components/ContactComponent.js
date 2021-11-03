@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Breadcrumb, BreadcrumbItem, Button, Label, Col, Row } from 'reactstrap'   // import react breadcrumbs component
 import { Link } from 'react-router-dom';    // for linking to a page (similar to <a href=>)
-import { Control, Form, Errors, actions } from 'react-redux-form';      // redux components instead of using regular form components
+import { Control, Form, Errors } from 'react-redux-form';      // redux components instead of using regular form components
 
 // Check if there's a value. If returns false, the test failed it will create an error validation
 const required = val => val && val.length;  // function(val) checks => if there's a val (not underfined or null) && val.length (greater than 0)
@@ -50,9 +50,8 @@ class Contact extends Component {
 
     // Event handler for when the user submits the form
     handleSubmit(values) {
-        console.log("Current state is: " + JSON.stringify(values));     // JSON.stringify() : global method that converts js object into a string
-        alert("Current state is: " + JSON.stringify(values));
         this.props.resetFeedbackForm();     // when the form is submitted, it resets it to the initial values (empty strings)
+        this.props.postFeedback(values);
     }
 
     render () {

@@ -13,7 +13,7 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
 // React redux component we downloaded
 import { connect } from 'react-redux';
 import { actions } from 'react-redux-form';
-import { postComment, fetchCampsites, fetchComments, fetchPromotions } from '../redux/ActionCreators';   // for dispatching
+import { postComment, fetchCampsites, fetchComments, fetchPromotions, fetchPartners, postFeedback } from '../redux/ActionCreators';   // for dispatching
 // React transition group we downloaded
 import { TransitionGroup, CSSTransition } from 'react-transition-group';    // for effects and animation
 
@@ -34,7 +34,9 @@ const mapDispatchToProps = {
     // (function parameters) => (returns action creator(for each parameters))
     resetFeedbackForm: () => (actions.reset('feedbackForm')),    // from configureStore.js
     fetchComments: () => (fetchComments()),
-    fetchPromotions: () => (fetchPromotions())
+    fetchPromotions: () => (fetchPromotions()),
+    fetchPartners: () => (fetchPartners()),
+    postFeedback: (feedback) => (postFeedback(feedback))
 };  // then add this object in the export connect()
 
 class Main extends Component {
@@ -44,6 +46,7 @@ class Main extends Component {
         this.props.fetchCampsites();
         this.props.fetchComments();
         this.props.fetchPromotions();
+        this.props.fetchPartners();
     }
 
     render() {  
@@ -58,7 +61,9 @@ class Main extends Component {
                     promotion={this.props.promotions.promotions.filter(promotion => promotion.featured)[0]} // promotions object pointing to its property called promotions
                     promotionLoading={this.props.promotions.isLoading}
                     promotionErrMess={this.props.promotions.errMess}
-                    partner={this.props.partners.filter(partner => partner.featured)[0]}
+                    partner={this.props.partners.partners.filter(partner => partner.featured)[0]}
+                    partnerLoading={this.props.partners.isLoading}
+                    partnerErrMess={this.props.partners.errMess}
                 />
             );
         }   //  locally scope, only accessible inside the Main component
@@ -90,7 +95,7 @@ class Main extends Component {
                             <Route path='/directory/:campsiteId' component={CampsiteWithId} /> 
                             <Route exact path='/aboutus' render={() => <About 
                                 partners={this.props.partners} />} /> 
-                            <Route exact path='/contactus' render={() => <Contact resetFeedbackForm={this.props.resetFeedbackForm} />} />
+                            <Route exact path='/contactus' render={() => <Contact resetFeedbackForm={this.props.resetFeedbackForm} postFeedback={this.props.postFeedback}/>} />
                             <Redirect to='/home' />
                         </Switch>
                     </CSSTransition>
